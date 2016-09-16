@@ -55,6 +55,7 @@ type Config struct {
 type Server struct {
 	config      *Config
 	authMethods map[uint8]Authenticator
+	l           net.Listener
 }
 
 // New creates a new Server and potentially returns an error
@@ -96,12 +97,19 @@ func New(conf *Config) (*Server, error) {
 	return server, nil
 }
 
+// Close the server
+func (s *Server) Close() {
+
+	s.l.Close()
+}
+
 // ListenAndServe is used to create a listener and serve on it
 func (s *Server) ListenAndServe(network, addr string) error {
 	l, err := net.Listen(network, addr)
 	if err != nil {
 		return err
 	}
+	s.l = l
 	return s.Serve(l)
 }
 
